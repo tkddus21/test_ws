@@ -1,0 +1,42 @@
+<launch>
+
+  <!-- these are the arguments you can pass this launch file, for example paused:=true -->
+  <arg name="paused" default="false"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+  <arg name="debug" default="false"/>
+
+  <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find testbot_description)/worlds/testbot_world.world"/>
+    <arg name="debug" value="$(arg debug)" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    <arg name="headless" value="$(arg headless)"/>
+  </include>
+
+  <!-- Load robot description -->
+  <param name="robot_description" 
+         command="$(find xacro)/xacro $(find testbot_description)/urdf/testbot_gazebo.urdf.xacro" />
+
+  <!-- Spawn a robot into Gazebo -->
+  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" 
+        args="-urdf -model turtlebot2 -param robot_description -x 0 -y 0 -z 0.1" 
+        output="screen"/>
+
+  <!-- Robot State Publisher -->
+  <node pkg="robot_state_publisher" 
+        type="robot_state_publisher" 
+        name="robot_state_publisher">
+    <param name="publish_frequency" value="20"/>
+  </node>
+
+  <!-- TF Broadcaster for base_link to odom -->
+  <node pkg="testbot_description" 
+        type="tf_broadcaster.py" 
+        name="tf_broadcaster" 
+        output="screen"/>
+
+</launch>

@@ -1,0 +1,24 @@
+<launch>
+  <!-- Load robot description -->
+  <param name="robot_description" 
+         command="$(find xacro)/xacro $(find testbot_description)/urdf/testbot.urdf.xacro" />
+
+  <!-- Robot State Publisher -->
+  <node pkg="robot_state_publisher" 
+        type="robot_state_publisher" 
+        name="robot_state_publisher">
+    <param name="publish_frequency" value="20"/>
+  </node>
+
+  <!-- Joint State Publisher (GUI for manual joint control) -->
+  <node pkg="joint_state_publisher_gui" 
+        type="joint_state_publisher_gui" 
+        name="joint_state_publisher_gui"/>
+
+  <!-- RViz -->
+  <node pkg="rviz" 
+        type="rviz" 
+        name="rviz" 
+        args="-d $(find testbot_description)/rviz/testbot.rviz"/>
+
+</launch>
